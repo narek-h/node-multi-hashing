@@ -31,11 +31,11 @@
     "decrypt"
   ],
     "scripts": {
-    "install": "node-gyp rebuild"
+    "install": "node-gyp configure build"
   },
   "gypfile": true,
   "readmeFilename": "README.md",
-  "description": "node-multi-hashing",
+  "description": "unomp-multi-hashing",
   "bugs": {
     "url": "https://github.com/UNOMP/node-multi-hashing/issues"
   }
