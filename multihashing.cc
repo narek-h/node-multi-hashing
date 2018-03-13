@@ -31,10 +31,12 @@ extern "C" {
     #include "dcrypt.h"
     #include "jh.h"
     #include "x5.h"
-    #include "c11.h"
+    #include "c11.h"    
 }
 
 #include "boolberry.h"
+#include "egihash.h"
+#include "egihash_common.h"
 
 using namespace node;
 using namespace v8;
@@ -86,6 +88,32 @@ Handle<Value> x11(const Arguments& args) {
     Buffer* buff = Buffer::New(output, 32);
     return scope.Close(buff->handle_);
 }
+
+
+Handle<Value> egihash(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 3) {
+        return except("You must provide three argument");
+    }
+
+    Local<Object> target = args[0]->ToObject();
+    int height = args[1]->Int32Value();
+    uint32_t nonce = args[2]->Int32Value();
+
+    if (!Buffer::HasInstance(target)) {
+        return except("Argument should be a buffer object.");
+    }
+
+    char * input = Buffer::Data(target);
+    CBlockHeaderTruncatedLE truncatedBlockHeader(input);
+    n_egihash::h256_t headerHash(&truncatedBlockHeader, sizeof(truncatedBlockHeader));
+    n_egihash::result_t ret = n_egihash::light::hash(n_egihash::cache_t(height), headerHash, nonce);
+
+    Buffer* buff = Buffer::New((char*) ret.value.b, 32);
+    return scope.Close(buff->handle_);
+}
+
 
 Handle<Value> x5(const Arguments& args) {
     HandleScope scope;
@@ -784,6 +812,7 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("dcrypt"), FunctionTemplate::New(dcrypt)->GetFunction());
     exports->Set(String::NewSymbol("jh"), FunctionTemplate::New(jh)->GetFunction());
     exports->Set(String::NewSymbol("c11"), FunctionTemplate::New(c11)->GetFunction());
+    exports->Set(String::NewSymbol("egihash"), FunctionTemplate::New(egihash)->GetFunction());
 }
 
 NODE_MODULE(multihashing, init)
