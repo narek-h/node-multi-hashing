@@ -4,7 +4,7 @@
             "target_name": "multihashing",
             "sources": [
                 "multihashing.cc",
-                "egihash.cpp",
+                "nrghash.cpp",
                 "keccak-tiny.c",
                 "scryptn.c",
                 "yescrypt/sha256_Y.c",
