@@ -2,7 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "egihash.h"
+#include "nrghash.h"
 extern "C"
 {
 #include "keccak-tiny.h"
@@ -24,7 +24,7 @@ extern "C"
 
 namespace
 {
-	using namespace n_egihash;
+	using namespace n_nrghash;
 
 #pragma pack(push, 1)
 	struct dag_file_header_t
@@ -305,7 +305,7 @@ namespace
 	}
 }
 
-namespace n_egihash
+namespace n_nrghash
 {
 	constexpr h256_t::size_type h256_t::hash_size;
 
