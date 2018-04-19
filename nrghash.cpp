@@ -64,7 +64,7 @@ namespace
 
 			if (std::string(magic) != constants::DAG_MAGIC_BYTES)
 			{
-//				throw hash_exception("Not a DAG file");
+				throw hash_exception("Not a DAG file");
 			}
 
 			read(&major_version, sizeof(major_version));
@@ -72,7 +72,7 @@ namespace
 			read(&minor_version, sizeof(minor_version));
 			if ((major_version != constants::MAJOR_VERSION) || (revision != constants::REVISION))
 			{
-//				throw hash_exception("DAG version is invalid");
+				throw hash_exception("DAG version is invalid");
 			}
 
 			read(&epoch, sizeof(epoch));
@@ -85,14 +85,14 @@ namespace
 			cache_t::size_type cache_size = cache_t::get_cache_size((epoch * constants::EPOCH_LENGTH) + 1);
 			if ((cache_end <= cache_begin) || (cache_size != (cache_end - cache_begin)))
 			{
-//				throw hash_exception("DAG cache is corrupt");
+				throw hash_exception("DAG cache is corrupt");
 			}
 
 			// validate size of DAG
 			uint64_t const size = dag_t::get_full_size((epoch * constants::EPOCH_LENGTH) + 1); // get the correct dag size
 			if ((dag_end <= dag_begin) || (size != (dag_end - dag_begin)))
 			{
-//				throw hash_exception("DAG is corrupt");
+				throw hash_exception("DAG is corrupt");
 			}
 		}
 	};
@@ -201,7 +201,7 @@ namespace
 		{
 			if (HashFunction(reinterpret_cast<uint8_t*>(data.data()), hash_size, reinterpret_cast<uint8_t const *>(input), input_size) != 0)
 			{
-//				throw hash_exception("Unable to compute hash"); // TODO: better message?
+				throw hash_exception("Unable to compute hash"); // TODO: better message?
 			}
 		}
 
@@ -314,7 +314,7 @@ namespace n_nrghash
 	{
 		if (::sha3_256(b, hash_size, reinterpret_cast<uint8_t const *>(input_data), input_size) != 0)
 		{
-//			throw hash_exception("Keccak-256 computation failed.");
+			throw hash_exception("Keccak-256 computation failed.");
 		}
 	}
 
@@ -348,7 +348,7 @@ namespace n_nrghash
 	{
 		if (::sha3_512(b, hash_size, reinterpret_cast<uint8_t const *>(input_data), input_size) != 0)
 		{
-//			throw hash_exception("Keccak-512 computation failed.");
+			throw hash_exception("Keccak-512 computation failed.");
 		}
 	}
 
@@ -465,7 +465,7 @@ namespace n_nrghash
 				data.push_back(sha3_512(data.back()));
 				if (((i % constants::CALLBACK_FREQUENCY) == 0) && !callback(i, n, cache_seeding))
 				{
-//					throw hash_exception("Cache creation cancelled.");
+					throw hash_exception("Cache creation cancelled.");
 				}
 			}
 
@@ -487,7 +487,7 @@ namespace n_nrghash
 
 					if (((++progress_counter % constants::CALLBACK_FREQUENCY) == 0) && !callback(progress_counter, n * constants::CACHE_ROUNDS, cache_generation))
 					{
-//						throw hash_exception("Cache creation cancelled.");
+						throw hash_exception("Cache creation cancelled.");
 					}
 				}
 			}
@@ -505,7 +505,7 @@ namespace n_nrghash
 				read(&i[0], constants::HASH_BYTES);
 				if (((++count % constants::CALLBACK_FREQUENCY) == 0) && !callback(count, cache_hash_count, cache_loading))
 				{
-//					throw hash_exception("Cache loading cancelled.");
+					throw hash_exception("Cache loading cancelled.");
 				}
 			}
 		}
@@ -600,7 +600,7 @@ namespace n_nrghash
 		}
 
 		// we couldn't insert it and it's not in the cache
-//		throw hash_exception("Could not get cache");
+		throw hash_exception("Could not get cache");
 	}
 
 	cache_t::cache_t(uint64_t const block_number, progress_callback_type callback)
@@ -702,7 +702,7 @@ namespace n_nrghash
 				read(&i[0], constants::HASH_BYTES);
 				if (((++count % constants::CALLBACK_FREQUENCY) == 0) && !callback(count, data.size(), dag_loading))
 				{
-//					throw hash_exception("DAG loading cancelled.");
+					throw hash_exception("DAG loading cancelled.");
 				}
 			}
 		}
@@ -724,7 +724,7 @@ namespace n_nrghash
 				fs.write(reinterpret_cast<char const *>(data), count);
 				if (fs.fail())
 				{
-//					throw hash_exception("Write failure");
+					throw hash_exception("Write failure");
 				}
 			};
 
@@ -748,7 +748,7 @@ namespace n_nrghash
 				}
 				if (((++count % constants::CALLBACK_FREQUENCY) == 0) && !callback(count, max_count, dag_saving))
 				{
-//					throw hash_exception("DAG save cancelled.");
+					throw hash_exception("DAG save cancelled.");
 				}
 			}
 
@@ -760,7 +760,7 @@ namespace n_nrghash
 				}
 				if (((++count % constants::CALLBACK_FREQUENCY) == 0) && !callback(count, max_count, dag_saving))
 				{
-//					throw hash_exception("DAG save cancelled.");
+					throw hash_exception("DAG save cancelled.");
 				}
 			}
 		}
@@ -774,7 +774,7 @@ namespace n_nrghash
 				data.push_back(calc_dataset_item(cache.data(), i));
 				if ((i % constants::CALLBACK_FREQUENCY) == 0 && !callback(i, n, dag_generation))
 				{
-///					throw hash_exception("DAG creation cancelled.");
+					throw hash_exception("DAG creation cancelled.");
 				}
 			}
 		}
@@ -879,7 +879,7 @@ namespace n_nrghash
 		}
 
 		// we couldn't insert it and it's not in the cache
-//		throw hash_exception("Could not get DAG");
+		throw hash_exception("Could not get DAG");
 	}
 
 	::std::shared_ptr<dag_t::impl_t> get_dag(::std::string const & file_path, progress_callback_type callback)
@@ -892,7 +892,7 @@ namespace n_nrghash
 
 		if (fs.fail())
 		{
-//			throw hash_exception("Could not open DAG file.");
+			throw hash_exception("Could not open DAG file.");
 		}
 
 		fs.seekg(0, ios::end);
@@ -902,7 +902,7 @@ namespace n_nrghash
 		// check minimum dag size
 		if (filesize < constants::DAG_FILE_MINIMUM_SIZE)
 		{
-//			throw hash_exception("DAG is corrupt");
+			throw hash_exception("DAG is corrupt");
 		}
 
 		// data for 64MiB reads
@@ -914,7 +914,7 @@ namespace n_nrghash
 		fs.read(buffer_ptr, read_buffer.size());
 		if (fs.fail() && !fs.eof())
 		{
-//			throw hash_exception("Read failure");
+			throw hash_exception("Read failure");
 		}
 
 		// TODO: this func needs to be made endian safe
@@ -926,7 +926,7 @@ namespace n_nrghash
 				fs.read(&read_buffer[0], read_buffer.size());
 				if (fs.fail() && !fs.eof())
 				{
-//					throw hash_exception("Read failure");
+					throw hash_exception("Read failure");
 				}
 				buffer_ptr = &read_buffer[0];
 			}
@@ -942,7 +942,7 @@ namespace n_nrghash
 				fs.read(&read_buffer[0], read_buffer.size());
 				if (fs.fail() && !fs.eof())
 				{
-//					throw hash_exception("Read failure");
+					throw hash_exception("Read failure");
 				}
 				buffer_ptr = &read_buffer[0];
 			}
@@ -956,7 +956,7 @@ namespace n_nrghash
 
 		if ((header.cache_end >= filesize) || (header.dag_end > (filesize + 1)))
 		{
-//			throw hash_exception("DAG is corrupt");
+			throw hash_exception("DAG is corrupt");
 		}
 
 		// if we have the correct DAG already loaded, return it from the cache
@@ -990,7 +990,7 @@ namespace n_nrghash
 		}
 
 		// we couldn't insert it and it's not in the cache
-		//throw hash_exception("Could not get DAG");
+		throw hash_exception("Could not get DAG");
 	}
 
 	dag_t::dag_t(uint64_t block_number, progress_callback_type callback)
@@ -1034,7 +1034,7 @@ namespace n_nrghash
 		auto const i = get_dag_cache().erase(epoch());
 		if (i == 0)
 		{
-//			throw hash_exception("Can not unload DAG - not loaded.");
+			throw hash_exception("Can not unload DAG - not loaded.");
 		}
 	}
 

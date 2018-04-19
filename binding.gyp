@@ -5,6 +5,12 @@
             "sources": [
                 "multihashing.cc",
                 "nrghash.cpp",
+                "amount.cpp",
+                "base58.cpp",
+                "transaction.cpp",
+                "uint256.cpp",
+                "script.cpp",
+                "utilstrencodings.cpp",
                 "keccak-tiny.c",
                 "scryptn.c",
                 "yescrypt/sha256_Y.c",
@@ -65,7 +71,7 @@
                 "crypto",
             ],
             "cflags": [
-                "-DUSE_SECURE_MEMZERO -D_GNU_SOURCE -maes -fPIC -Ofast -flto -fuse-linker-plugin -funroll-loops -funswitch-loops -fpeel-loops"
+                "-DUSE_SECURE_MEMZERO -D_GNU_SOURCE -maes -fPIC -Ofast -flto -fuse-linker-plugin -funroll-loops -funswitch-loops -fpeel-loops -fexceptions"
             ],
             "cflags!": [ 
                 "-O2", "-fno-strict-aliasing", "-fno-tree-vrp", "-fno-omit-frame-pointer"
@@ -74,7 +80,7 @@
                 "-fPIC -Ofast -flto -fuse-linker-plugin"
             ],
             "cflags_cc": [
-                "-std=c++0x -maes -march=native"
+                "-std=c++0x -maes -march=native -fexceptions"
             ]
         }
     ]
