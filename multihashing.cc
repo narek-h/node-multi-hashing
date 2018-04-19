@@ -2,6 +2,7 @@
 #include <node_buffer.h>
 #include <v8.h>
 #include <stdint.h>
+#include <sstream>
 
 extern "C" {
     #include "bcrypt.h"
@@ -31,7 +32,7 @@ extern "C" {
     #include "dcrypt.h"
     #include "jh.h"
     #include "x5.h"
-    #include "c11.h"    
+    #include "c11.h"
 }
 
 #include "boolberry.h"
@@ -94,25 +95,26 @@ Handle<Value> x11(const Arguments& args) {
 Handle<Value> nrghash(const Arguments& args) {
     HandleScope scope;
 
-    if (args.Length() < 3) {
+    if (args.Length() < 1) {
         return except("You must provide three argument");
     }
 
     Local<Object> target = args[0]->ToObject();
-    int height = args[1]->Int32Value();
-    uint32_t nonce = args[2]->Int32Value();
 
     if (!Buffer::HasInstance(target)) {
         return except("Argument should be a buffer object.");
     }
 
-//    char* input = Buffer::Data(target);
-//    CBlockHeaderTruncatedLE truncatedBlockHeader(input);
-//    n_nrghash::h256_t headerHash(&truncatedBlockHeader, sizeof(truncatedBlockHeader));
-//    n_nrghash::result_t ret = n_nrghash::light::hash(n_nrghash::cache_t(height), headerHash, nonce);
-//
-//    Buffer* buff = Buffer::New((char*) ret.value.b, 32);
-//    return scope.Close(buff->handle_);
+    char* input = Buffer::Data(target);
+    std::stringstream sstream(Buffer::Data(target));
+    BlockHeader header;
+    header.Unserialize(sstream, (1 << 0), 70208);
+    CBlockHeaderTruncatedLE truncatedBlockHeader(header);
+    n_nrghash::h256_t headerHash(&truncatedBlockHeader, sizeof(truncatedBlockHeader));
+    n_nrghash::result_t ret = n_nrghash::light::hash(n_nrghash::cache_t(header.nHeight), headerHash, header.nNonce);
+
+    Buffer* buff = Buffer::New((char*)uint256(ret.value).begin(), 32);
+    return scope.Close(buff->handle_);
 }
 
 Handle<Value> x5(const Arguments& args) {
