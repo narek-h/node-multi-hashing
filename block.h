@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <cstdio>
 #include <sstream>
 #include <cstdlib>
 #include <vector>
@@ -54,6 +55,19 @@ struct BlockHeader
         nHeight = 0;
         hashMix.SetNull();
         nNonce = 0;
+    }
+
+    friend std::ostream& operator << (std::ostream& os, const BlockHeader& header)
+    {
+        os << "version: "        << header.nVersion                  << " \n"
+           << "hashPrevBlock: "  << header.hashPrevBlock.ToString()  << " \n"
+           <<" hashMerkleRoot: " << header.hashMerkleRoot.ToString() << " \n"
+           << "Time: "           << header.nTime                     << " \n"
+           << "Bits: "           << header.nBits                     << " \n"
+           << "Height: "         << header.nHeight                   << " \n"
+           << "hashMix: "        << header.hashMix.ToString()        << " \n"
+           << "Nonce: "          << header.nNonce                    << " \n";
+        return os;
     }
 };
 
