@@ -95,20 +95,24 @@ Handle<Value> x11(const Arguments& args) {
 Handle<Value> nrghash(const Arguments& args) {
     HandleScope scope;
 
-    if (args.Length() < 1) {
+    if (args.Length() < 9) {
         return except("You must provide three argument");
     }
 
     Local<Object> target = args[0]->ToObject();
-
     if (!Buffer::HasInstance(target)) {
         return except("Argument should be a buffer object.");
     }
-
-    char* input = Buffer::Data(target);
-    std::stringstream sstream(Buffer::Data(target));
     BlockHeader header;
-    header.Unserialize(sstream, (1 << 0), 70208);
+    header.nVersion = args[1]->Int32Value();
+    header.hashPrevBlock.SetHex(*v8::String::Utf8Value(args[2]->ToString()));
+    header.hashMerkleRoot.SetHex(*v8::String::Utf8Value(args[3]->ToString()));
+    header.nTime = args[4]->Int32Value();
+    header.nBits = args[5]->Int32Value();
+    header.nHeight = args[6]->Int32Value();
+    header.hashMix.SetHex(*v8::String::Utf8Value(args[7]->ToString()));
+    header.nNonce = args[8]->IntegerValue();
+
     CBlockHeaderTruncatedLE truncatedBlockHeader(header);
     n_nrghash::h256_t headerHash(&truncatedBlockHeader, sizeof(truncatedBlockHeader));
     n_nrghash::result_t ret = n_nrghash::light::hash(n_nrghash::cache_t(header.nHeight), headerHash, header.nNonce);
