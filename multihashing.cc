@@ -144,7 +144,6 @@ Handle<Value> blockhash(const Arguments& args) {
 
     CBlockHeaderFullLE fullBlockHeader(header);
     n_nrghash::h256_t blockHash(&fullBlockHeader, sizeof(fullBlockHeader));
-    std::cout << blockHash.to_hex() << std::endl;
     uint256  res = uint256(blockHash);
     Buffer* buff = Buffer::New((char*)uint256(blockHash).begin(), 32);
     return scope.Close(buff->handle_);
