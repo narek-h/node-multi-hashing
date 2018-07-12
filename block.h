@@ -136,6 +136,22 @@ struct CBlockHeaderTruncatedLE
 };
 
 static_assert(sizeof(CBlockHeaderTruncatedLE) == 146, "CBlockHeaderTruncatedLE has incorrect size");
+
+struct CBlockHeaderFullLE : public CBlockHeaderTruncatedLE
+{
+    uint64_t nNonce;
+    char hashMix[65];
+
+    CBlockHeaderFullLE(BlockHeader const & h)
+        : CBlockHeaderTruncatedLE(h)
+          , nNonce(h.nNonce)
+          , hashMix{0}
+    {
+        auto mixString = h.hashMix.ToString();
+        memcpy(hashMix, mixString.c_str(), (std::min)(mixString.size(), sizeof(hashMix)));
+    }
+};
+static_assert(sizeof(CBlockHeaderFullLE) == 219, "CBlockHeaderFullLE has incorrect size");
 #pragma pack(pop)
 
 } // namespace energi
