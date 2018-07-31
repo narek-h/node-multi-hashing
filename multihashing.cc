@@ -2,6 +2,7 @@
 #include <node_buffer.h>
 #include <v8.h>
 #include <stdint.h>
+#include <sstream>
 
 extern "C" {
     #include "bcrypt.h"
@@ -35,8 +36,11 @@ extern "C" {
 }
 
 #include "boolberry.h"
+#include "nrghash.h"
+#include "block.h"
 
 using namespace node;
+using namespace energi;
 using namespace v8;
 
 Handle<Value> except(const char* msg) {
@@ -84,6 +88,64 @@ Handle<Value> x11(const Arguments& args) {
     x11_hash(input, output, input_len);
 
     Buffer* buff = Buffer::New(output, 32);
+    return scope.Close(buff->handle_);
+}
+
+
+Handle<Value> nrghash(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 9) {
+        return except("You must provide three argument");
+    }
+
+    Local<Object> target = args[0]->ToObject();
+    if (!Buffer::HasInstance(target)) {
+        return except("Argument should be a buffer object.");
+    }
+    BlockHeader header;
+    header.nVersion = args[1]->Int32Value();
+    header.hashPrevBlock.SetHex(*v8::String::Utf8Value(args[2]->ToString()));
+    header.hashMerkleRoot.SetHex(*v8::String::Utf8Value(args[3]->ToString()));
+    header.nTime = args[4]->Int32Value();
+    header.nBits = args[5]->Int32Value();
+    header.nHeight = args[6]->Int32Value();
+    header.hashMix.SetHex(*v8::String::Utf8Value(args[7]->ToString()));
+    header.nNonce = args[8]->IntegerValue();
+
+    CBlockHeaderTruncatedLE truncatedBlockHeader(header);
+    n_nrghash::h256_t headerHash(&truncatedBlockHeader, sizeof(truncatedBlockHeader));
+    n_nrghash::result_t ret = n_nrghash::light::hash(n_nrghash::cache_t(header.nHeight), headerHash, header.nNonce);
+
+    Buffer* buff = Buffer::New((char*)uint256(ret.value).begin(), 32);
+    return scope.Close(buff->handle_);
+}
+
+Handle<Value> blockhash(const Arguments& args) {
+    HandleScope scope;
+
+    if (args.Length() < 9) {
+        return except("You must provide ten arguments");
+    }
+
+    Local<Object> target = args[0]->ToObject();
+    if (!Buffer::HasInstance(target)) {
+        return except("Argument should be a buffer object.");
+    }
+    BlockHeader header;
+    header.nVersion = args[1]->Int32Value();
+    header.hashPrevBlock.SetHex(*v8::String::Utf8Value(args[2]->ToString()));
+    header.hashMerkleRoot.SetHex(*v8::String::Utf8Value(args[3]->ToString()));
+    header.nTime = args[4]->Int32Value();
+    header.nBits = args[5]->Int32Value();
+    header.nHeight = args[6]->Int32Value();
+    header.hashMix.SetHex(*v8::String::Utf8Value(args[7]->ToString()));
+    header.nNonce = args[8]->IntegerValue();
+
+    CBlockHeaderFullLE fullBlockHeader(header);
+    n_nrghash::h256_t blockHash(&fullBlockHeader, sizeof(fullBlockHeader));
+    uint256  res = uint256(blockHash);
+    Buffer* buff = Buffer::New((char*)uint256(blockHash).begin(), 32);
     return scope.Close(buff->handle_);
 }
 
@@ -784,6 +846,8 @@ void init(Handle<Object> exports) {
     exports->Set(String::NewSymbol("dcrypt"), FunctionTemplate::New(dcrypt)->GetFunction());
     exports->Set(String::NewSymbol("jh"), FunctionTemplate::New(jh)->GetFunction());
     exports->Set(String::NewSymbol("c11"), FunctionTemplate::New(c11)->GetFunction());
+    exports->Set(String::NewSymbol("nrghash"), FunctionTemplate::New(nrghash)->GetFunction());
+    exports->Set(String::NewSymbol("blockhash"), FunctionTemplate::New(blockhash)->GetFunction());
 }
 
 NODE_MODULE(multihashing, init)
