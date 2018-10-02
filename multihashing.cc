@@ -1,4 +1,5 @@
 #include <node.h>
+#include <iostream>
 #include <node_buffer.h>
 #include <v8.h>
 #include <stdint.h>
@@ -96,7 +97,7 @@ Handle<Value> nrghash(const Arguments& args) {
     HandleScope scope;
 
     if (args.Length() < 9) {
-        return except("You must provide three argument");
+        return except("You must provide ten argument");
     }
 
     Local<Object> target = args[0]->ToObject();
@@ -111,7 +112,7 @@ Handle<Value> nrghash(const Arguments& args) {
     header.nBits = args[5]->Int32Value();
     header.nHeight = args[6]->Int32Value();
     header.hashMix.SetHex(*v8::String::Utf8Value(args[7]->ToString()));
-    header.nNonce = args[8]->IntegerValue();
+	header.nNonce = args[8]->IntegerValue();
 
     CBlockHeaderTruncatedLE truncatedBlockHeader(header);
     n_nrghash::h256_t headerHash(&truncatedBlockHeader, sizeof(truncatedBlockHeader));
@@ -140,7 +141,7 @@ Handle<Value> blockhash(const Arguments& args) {
     header.nBits = args[5]->Int32Value();
     header.nHeight = args[6]->Int32Value();
     header.hashMix.SetHex(*v8::String::Utf8Value(args[7]->ToString()));
-    header.nNonce = args[8]->IntegerValue();
+	header.nNonce = args[8]->IntegerValue();
 
     CBlockHeaderFullLE fullBlockHeader(header);
     n_nrghash::h256_t blockHash(&fullBlockHeader, sizeof(fullBlockHeader));
