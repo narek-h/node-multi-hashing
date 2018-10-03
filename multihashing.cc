@@ -112,8 +112,8 @@ Handle<Value> nrghash(const Arguments& args) {
     header.nBits = args[5]->Int32Value();
     header.nHeight = args[6]->Int32Value();
     header.hashMix.SetHex(*v8::String::Utf8Value(args[7]->ToString()));
-	auto nonce = std::string(*v8::String::Utf8Value(args[8]->ToString()));
-	header.nNonce = strtoull(nonce.c_str(), nullptr, 16);
+    auto nonce = std::string(*v8::String::Utf8Value(args[8]->ToString()));
+    header.nNonce = strtoull(nonce.c_str(), nullptr, 16);
 
     CBlockHeaderTruncatedLE truncatedBlockHeader(header);
     n_nrghash::h256_t headerHash(&truncatedBlockHeader, sizeof(truncatedBlockHeader));
@@ -142,8 +142,8 @@ Handle<Value> blockhash(const Arguments& args) {
     header.nBits = args[5]->Int32Value();
     header.nHeight = args[6]->Int32Value();
     header.hashMix.SetHex(*v8::String::Utf8Value(args[7]->ToString()));
-	auto nonce = std::string(*v8::String::Utf8Value(args[8]->ToString()));
-	header.nNonce = strtoull(nonce.c_str(), nullptr, 16);
+    auto nonce = std::string(*v8::String::Utf8Value(args[8]->ToString()));
+    header.nNonce = strtoull(nonce.c_str(), nullptr, 16);
 
     CBlockHeaderFullLE fullBlockHeader(header);
     n_nrghash::h256_t blockHash(&fullBlockHeader, sizeof(fullBlockHeader));
