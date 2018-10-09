@@ -5,14 +5,20 @@
   "author": {
     "name": "zone117x"
   },
+  "contributors": [
+    {
+     "name": "Energi Core Team"
+    }
+   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/UNOMP/node-multi-hashing.git"
+    "url": "https://github.com/energicryptocurrency/node-multi-hashing.git"
   },
   "dependencies": {
     "bindings": "*"
   },
   "keywords": [
+    "nrghash",
     "scrypt",
     "scryptjane",
     "script-n",
@@ -37,6 +43,6 @@
   "readmeFilename": "README.md",
   "description": "unomp-multi-hashing",
   "bugs": {
-    "url": "https://github.com/UNOMP/node-multi-hashing/issues"
+    "url": "https://github.com/energicryptocurrency/node-multi-hashing/issues"
   }
 }
